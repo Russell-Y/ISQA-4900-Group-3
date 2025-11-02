@@ -1,3 +1,8 @@
 from django.shortcuts import render
 
-# Create your views here.
+from django.http import JsonResponse
+
+def test_api(request):
+    data = {"message": "Frontend and Backend are connected!"}
+    return JsonResponse(data)
+
