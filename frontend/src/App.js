@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import Navbar from "./components/Navbar";
+import "./App.css";
 
 function App() {
-  const [backendData, setBackendData] = useState("");
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/test/")
-      .then(response => response.json())
-      .then(data => setBackendData(data.message))
-      .catch(error => console.error("Error fetching backend:", error));
-  }, []);
-
   return (
-    <div style={{ textAlign: "center", marginTop: "20%" }}>
-      <h1>{backendData || "Loading connection..."}</h1>
-    </div>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+      </Routes>
+    </Router>
   );
 }
 
