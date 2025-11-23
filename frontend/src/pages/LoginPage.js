@@ -4,32 +4,31 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Attempting login with:\nUsername: ${username}\nPassword: ${password}`);
+    console.log("Login submitted:", { username, password });
+    // You can connect this to your Django backend later
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Login to ConnectU</h2>
-      <form onSubmit={handleLogin}>
+    <div style={{ textAlign: "center", marginTop: "10%" }}>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit} style={{ display: "inline-block", textAlign: "left" }}>
+        <label>Username:</label><br />
         <input
           type="text"
-          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ margin: "10px", padding: "8px" }}
-        />
-        <br />
+          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+        /><br />
+        <label>Password:</label><br />
         <input
           type="password"
-          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ margin: "10px", padding: "8px" }}
-        />
-        <br />
-        <button type="submit" style={{ padding: "10px 20px" }}>Login</button>
+          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+        /><br />
+        <button type="submit">Login</button>
       </form>
     </div>
   );
