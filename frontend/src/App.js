@@ -4,9 +4,6 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import Navbar from "./components/Navbar";
-import GroupsPage from "./pages/GroupsPage";
-import GroupDetailsPage from "./pages/GroupDetailsPage";
-
 import "./App.css";
 
 function App() {
@@ -16,8 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} /><Route path="/groups" element={<GroupsPage />} />
-        <Route path="/groups/:id" element={<GroupDetailsPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </Router>
   );

@@ -41,8 +41,8 @@ SIMPLE_JWT = {
 }
 
 CORS_ORIGIN_WHITELIST = (
-    'https://localhost:8080',
-    'https://127.0.0.1:8080'
+    "https://group3-682rxy0ea-grants-projects-6ff3a05b.vercel.app",
+    "http://localhost:3000",
 )
 CORS_ORIGIN_ALLOW_ALL = True
 

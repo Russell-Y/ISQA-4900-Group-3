@@ -9,7 +9,10 @@ function LandingPage() {
     <div className="landing-container">
       <h1>Welcome to ConnectU</h1>
       <p>Connecting students across campus through collaboration and events.</p>
+      <p>Discover events, join groups, and build your campus network in one place.</p>
+
       <div className="button-group">
+        <button onClick={() => navigate("/events")}>View Events</button>
         <button onClick={() => navigate("/login")}>Login</button>
         <button onClick={() => navigate("/signup")}>Sign Up</button>
       </div>
