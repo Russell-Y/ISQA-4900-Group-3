@@ -53,7 +53,7 @@ function ProfilePage() {
         )}
       </div>
       <p className="profile-note">
-        (Later this will show your real data from the backend.)
+        (Here you will find your profile information)
       </p>
     </div>
   );
