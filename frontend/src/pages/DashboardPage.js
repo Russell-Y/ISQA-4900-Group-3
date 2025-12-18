@@ -32,6 +32,12 @@ function DashboardPage() {
         Welcome back, {user?.username || "student"}!
       </p>
 
+      <p className="dashboard-search-bar">
+        <input type="text" placeholder="search"></input>
+            <button type="submit">Search</button>
+      </p>
+
+
       <div className="dashboard-grid">
         <section className="dashboard-card">
           <h2>Quick Links</h2>
