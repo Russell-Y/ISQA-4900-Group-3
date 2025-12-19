@@ -17,16 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from django.conf import settings
-from django.conf.urls.static import static
-from ConnectU import views
-
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/test/', views.test_api),
-    path('', include('ConnectU.urls')),
-    path('api/', include('ConnectU.api.urls')),
-    path('', include('users.urls')),
-    path('api/', include('users.api.urls')),
-    path('', include('todo.urls'))
+    path("admin/", admin.site.urls),
+    path("", include("ConnectU.urls")),
 ]

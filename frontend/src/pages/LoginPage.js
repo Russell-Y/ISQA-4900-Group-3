@@ -1,37 +1,62 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser, setToken } from "../api";
 
-function LoginPage() {
+export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login submitted:", { username, password });
-    // You can connect this to your Django backend later
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await loginUser({ username, password });
+      setToken(data.access);
+      setPassword("");
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Login failed");
+      setPassword("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "10%" }}>
+    <div style={{ padding: "30px" }}>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit} style={{ display: "inline-block", textAlign: "left" }}>
-        <label>Username:</label><br />
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-        /><br />
-        <label>Password:</label><br />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-        /><br />
-        <button type="submit">Login</button>
+
+      {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
+
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "10px" }}>
+          <label>Username</label><br />
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+          />
+        </div>
+
+        <div style={{ marginBottom: "10px" }}>
+          <label>Password</label><br />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+        </div>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );
 }
-
-export default LoginPage;

@@ -1,26 +1,38 @@
-from tkinter import Image
-
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    date = models.CharField(max_length=50)
+    time = models.CharField(max_length=50, blank=True)
+    location = models.CharField(max_length=200, blank=True)
 
-    avatar = models.ImageField(upload_to="profile_pics/", null=True, blank=True)
+    attendees = models.ManyToManyField(User, related_name="joined_events", blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="events")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return self.title
 
-    def save(self, *args, **kwargs):
-        super(Profile, self).save(*args, **kwargs)
+from django.conf import settings
 
-        img = Image.open(self.avatar.path)
+class Group(models.Model):
+    name = models.CharField(max_length=120)
+    description = models.TextField(blank=True, default="")
+    category = models.CharField(max_length=60, blank=True, default="")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="groups_created",
+    )
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="groups_joined",
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-
-            img.thumbnail(output_size)
-            img.save(self.avatar.path)
-
-# Create your models here.
+    def __str__(self):
+        return self.name

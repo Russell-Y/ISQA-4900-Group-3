@@ -1,56 +1,93 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { registerUser, loginUser, setToken } from "../api";
 
-function SignupPage() {
+export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [imageSrc, setImageSrc] = useState('https://static.vecteezy.com/system/resources/previews/036/280/651/original/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg');
 
-  const handleSignup = (e) => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Signing up:\nUsername: ${username}\nEmail: ${email}\nPassword: ${password}\nAvatar: ${imageSrc}`);
+    setError("");
+    setLoading(true);
+
+    try {
+      await registerUser({ username, email, password });
+
+      const data = await loginUser({ username, password });
+      setToken(data.access);
+
+      setPassword("");
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Signup failed");
+      setPassword("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <img src={imgSrc} alt={"Avatar"} />
-      <h2>Create an Account</h2>
-      <form onSubmit={handleSignup}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ margin: "10px", padding: "8px" }}
-        />
-        <br />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ margin: "10px", padding: "8px" }}
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ margin: "10px", padding: "8px" }}
-        />
-        <br />
-        <input
-          type="imageSrc"
-          placeholder="ImageSrc"
-          value={imageSrc}
-          onChange={(e) => setImageSrc(e.target.value)}
-        />
-        <br />
-        <button type="submit" style={{ padding: "10px 20px" }}>Sign Up</button>
+    <div style={{ padding: "30px", maxWidth: "420px", margin: "0 auto" }}>
+      <h2>Sign Up</h2>
+
+      {error && (
+        <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "10px" }}>
+          <label>Username</label>
+          <br />
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+            required
+            style={{ width: "100%", padding: "8px" }}
+          />
+        </div>
+
+        <div style={{ marginBottom: "10px" }}>
+          <label>Email</label>
+          <br />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
+            style={{ width: "100%", padding: "8px" }}
+          />
+        </div>
+
+        <div style={{ marginBottom: "10px" }}>
+          <label>Password</label>
+          <br />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            required
+            style={{ width: "100%", padding: "8px" }}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          style={{ padding: "10px 16px" }}
+        >
+          {loading ? "Creating account..." : "Create Account"}
+        </button>
       </form>
     </div>
   );
 }
-
-export default SignupPage;
