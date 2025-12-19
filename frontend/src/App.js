@@ -9,6 +9,7 @@ import EventsPage from "./pages/EventsPage";
 import ProfilePage from "./pages/ProfilePage";
 import DashboardPage from "./pages/DashboardPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
+import GroupsPage from "./pages/GroupsPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/events/:id" element={<EventDetailsPage />} />
+        <Route path="/groups" element={<GroupsPage />} />
       </Routes>
     </Router>
   );

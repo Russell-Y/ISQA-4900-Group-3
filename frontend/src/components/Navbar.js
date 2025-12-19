@@ -28,6 +28,12 @@ function Navbar() {
           Events
         </Link>
         <Link
+          to="/groups"
+          style={{ color: "white", textDecoration: "none", marginRight: "15px" }}
+        >
+          Group
+        </Link>
+        <Link
           to="/profile"
           style={{ color: "white", textDecoration: "none", marginRight: "15px" }}
         >

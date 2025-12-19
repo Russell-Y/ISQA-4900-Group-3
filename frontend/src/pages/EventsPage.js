@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchEvents, createEvent } from "../api";
+import React, { useEffect, useMemo, useState } from "react";
+import { fetchEvents, joinEvent, leaveEvent } from "../api";
 import { useNavigate } from "react-router-dom";
 import "./EventsPage.css";
 
@@ -8,58 +8,88 @@ function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [query, setQuery] = useState("");
+  const [busyId, setBusyId] = useState(null);
 
   const navigate = useNavigate();
 
   const loadEvents = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      const data = await fetchEvents();
-      setEvents(data);
-    } catch (err) {
-      const msg = err.message || "Failed to load events";
-      if (msg.toLowerCase().includes("not logged in") || msg.toLowerCase().includes("token")) {
-        navigate("/login");
-        return;
-      }
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
+    const data = await fetchEvents();
+    setEvents(Array.isArray(data) ? data : []);
   };
 
   useEffect(() => {
-    loadEvents();
+    let mounted = true;
+
+    async function load() {
+      try {
+        await loadEvents();
+      } catch (err) {
+        if (!mounted) return;
+        setError(err.message || "Failed to load events");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSaving(true);
+  const filteredEvents = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return events;
 
+    return events.filter((e) => {
+      const title = (e.title || "").toLowerCase();
+      const location = (e.location || "").toLowerCase();
+      const desc = (e.description || "").toLowerCase();
+      const date = (e.date || "").toLowerCase();
+      return (
+        title.includes(q) ||
+        location.includes(q) ||
+        desc.includes(q) ||
+        date.includes(q)
+      );
+    });
+  }, [events, query]);
+
+  const handleJoin = async (eventId) => {
     try {
-      await createEvent({ title, date, time, location, description });
-      setTitle("");
-      setDate("");
-      setTime("");
-      setLocation("");
-      setDescription("");
+      setBusyId(eventId);
+      await joinEvent(eventId);
       await loadEvents();
     } catch (err) {
-      setError(err.message || "Failed to create event");
+      alert(err.message || "Failed to join event");
     } finally {
-      setSaving(false);
+      setBusyId(null);
+    }
+  };
+
+  const handleLeave = async (eventId) => {
+    try {
+      setBusyId(eventId);
+      await leaveEvent(eventId);
+      await loadEvents();
+    } catch (err) {
+      alert(err.message || "Failed to leave event");
+    } finally {
+      setBusyId(null);
     }
   };
 
   if (loading) return <div className="events-container">Loading events...</div>;
+
+  if (error) {
+    return (
+      <div className="events-container">
+        <h1 className="events-title">Upcoming Campus Events</h1>
+        <p style={{ color: "red" }}>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="events-container">
@@ -68,67 +98,66 @@ function EventsPage() {
         Discover what’s happening around campus and get involved.
       </p>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <div style={{ marginBottom: "25px" }}>
-        <h2>Create an Event</h2>
-        <form onSubmit={handleCreate} style={{ maxWidth: "600px" }}>
-          <input
-            placeholder="Title (required)"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{ width: "100%", marginBottom: "8px" }}
-            required
-          />
-          <input
-            placeholder="Date (e.g., Dec 18, 2025)"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={{ width: "100%", marginBottom: "8px" }}
-            required
-          />
-          <input
-            placeholder="Time (optional)"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            style={{ width: "100%", marginBottom: "8px" }}
-          />
-          <input
-            placeholder="Location (optional)"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            style={{ width: "100%", marginBottom: "8px" }}
-          />
-          <textarea
-            placeholder="Description (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            style={{ width: "100%", marginBottom: "8px" }}
-            rows={3}
-          />
-          <button type="submit" disabled={saving}>
-            {saving ? "Creating..." : "Create Event"}
-          </button>
-        </form>
+      {}
+      <div style={{ margin: "14px 0 18px", maxWidth: 520 }}>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search events by title, location, description, date..."
+          style={{ width: "100%", padding: "10px" }}
+          autoComplete="off"
+        />
+        <div style={{ fontSize: 12, color: "#666", marginTop: 6 }}>
+          Showing {filteredEvents.length} of {events.length}
+        </div>
       </div>
 
-      {events.length === 0 ? (
-        <p>No events available right now.</p>
+      {filteredEvents.length === 0 ? (
+        <p>No events match your search.</p>
       ) : (
         <div className="events-grid">
-          {events.map((event) => (
-            <div key={event.id} className="event-card">
-              <h2>{event.title}</h2>
-              <p className="event-meta">
-                {event.date} {event.time ? `• ${event.time}` : ""}
-              </p>
-              <p className="event-location">{event.location}</p>
-              <p className="event-description">{event.description}</p>
-              <button className="event-button" type="button" onClick={() => navigate(`/events/${event.id}`)}>
-                View Details
-              </button>
-            </div>
-          ))}
+          {filteredEvents.map((event) => {
+            const isBusy = busyId === event.id;
+            const isAttending = !!event.is_attending;
+
+            return (
+              <div key={event.id} className="event-card">
+                <h2>{event.title}</h2>
+                <p className="event-meta">
+                  {event.date} • {event.time}
+                </p>
+                <p className="event-location">{event.location}</p>
+                <p className="event-description">{event.description}</p>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+                  <button
+                    className="event-button"
+                    onClick={() => navigate(`/events/${event.id}`)}
+                  >
+                    View Details
+                  </button>
+
+                  {isAttending ? (
+                    <button
+                      className="event-button"
+                      onClick={() => handleLeave(event.id)}
+                      disabled={isBusy}
+                    >
+                      {isBusy ? "Leaving..." : "Leave"}
+                    </button>
+                  ) : (
+                    <button
+                      className="event-button"
+                      onClick={() => handleJoin(event.id)}
+                      disabled={isBusy}
+                    >
+                      {isBusy ? "Joining..." : "Join"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

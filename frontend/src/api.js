@@ -109,3 +109,115 @@ export async function deleteEvent(eventId) {
     method: "DELETE",
   });
 }
+
+export async function fetchGroups() {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request("/api/groups/", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function createGroup({ name, category = "", description = "" }) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request("/api/groups/", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, category, description }),
+  });
+}
+
+export async function joinGroup(groupId) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/groups/${groupId}/join/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function leaveGroup(groupId) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/groups/${groupId}/leave/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function updateGroup(groupId, updates) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/groups/${groupId}/`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(updates),
+  });
+}
+
+export async function deleteGroup(groupId) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/groups/${groupId}/`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function fetchDashboard() {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request("/api/dashboard/", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function fetchEventDetail(eventId) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/events/${eventId}/`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function joinEvent(eventId) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/events/${eventId}/join/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function leaveEvent(eventId) {
+  const token = getToken();
+  if (!token) throw new Error("Not logged in");
+
+  return request(`/api/events/${eventId}/leave/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}

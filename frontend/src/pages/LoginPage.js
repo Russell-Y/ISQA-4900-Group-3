@@ -18,7 +18,7 @@ export default function LoginPage() {
       const data = await loginUser({ username, password });
       setToken(data.access);
       setPassword("");
-      navigate("/profile");
+      navigate("/");
     } catch (err) {
       setError(err.message || "Login failed");
       setPassword("");

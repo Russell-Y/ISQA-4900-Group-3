@@ -10,4 +10,13 @@ urlpatterns = [
 
     path("api/events/", views.events, name="events"),
     path("api/events/<int:event_id>/", views.event_detail, name="event_detail"),
+    path("api/events/<int:event_id>/join/", views.event_join, name="event_join"),
+    path("api/events/<int:event_id>/leave/", views.event_leave, name="event_leave"),
+
+    path("api/groups/", views.groups, name="groups"),
+    path("api/groups/<int:group_id>/", views.group_detail, name="group_detail"),
+    path("api/groups/<int:group_id>/join/", views.group_join, name="group_join"),
+    path("api/groups/<int:group_id>/leave/", views.group_leave, name="group_leave"),
+
+    path("api/dashboard/", views.dashboard, name="dashboard"),
 ]
